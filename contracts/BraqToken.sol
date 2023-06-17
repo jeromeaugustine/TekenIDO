@@ -6,6 +6,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Braq is ERC20, Ownable {
 
+    uint256 public publicSaleSupply = 0;
+    // delete this
     address public ecosystemPool;
     address public rewardsPool;
     address public stakingPool;
@@ -45,7 +47,7 @@ contract Braq is ERC20, Ownable {
         poolAddress[pool]=adr;
     }
 
-    function fundPool(string memory pool)public onlyAdmin{
+    function fundPool(string memory pool) external onlyAdmin {
         if (block.timestamp < fundingTime[pool]){
             revert("Error: Too early");
         }
@@ -58,6 +60,18 @@ contract Braq is ERC20, Ownable {
 
         _transfer(address(this), poolAddress[pool], amountToFund[pool] * 10 ** decimals());
         funded[pool]= true;
+    }
+
+    function publicSale() public payable {
+        if(msg.value< 100 * 10 ** decimals()){
+            revert("Error: Too small amount for purchase");
+        }
+        if(msg.value * 10 ** decimals() > publicSaleSupply){
+            revert("Error: Too big amount for purchase");
+        }
+        uint256 tokenAmount = msg.value * 10 ** decimals();
+        _transfer(address(this), msg.sender, tokenAmount);
+        publicSaleSupply -= tokenAmount;
     }
 
 
