@@ -12,13 +12,16 @@ contract Braq is ERC20, Ownable {
     address public claimingPool;
 
     mapping(address => bool) public admins;
-    mapping(address => bool) public funded;
+    mapping(string => bool) public funded;
+    mapping(string => address) public poolAddress;
+    mapping(string => uint256) public amountToFund;
+    mapping(string => uint256) public fundingTime;
+
     // Modifier to restrict access to admins only
     modifier onlyAdmin() {
         require(admins[msg.sender], "Only admins can call this function.");
         _;
     }
-
     
     constructor() ERC20("Braq", "BRQ") {
         _mint(address(this), 150000000 * 10 ** decimals());
@@ -35,18 +38,26 @@ contract Braq is ERC20, Ownable {
         admins[_admin] = false;
     }
     
-    function fundEcosystem(address pool)public onlyAdmin{
-        if (time< ""){
-            revert("Error: Not an Admin");
+    function setPoolAddress(string memory pool, address adr) external onlyAdmin {
+        if(adr==address(0)){
+            revert("Errror: Insert a valid address");
         }
-        _transfer(address(this), ecosystemPool, 100* 10 ** decimals());
-        funded[pool]= true;
+        poolAddress[pool]=adr;
     }
-    function fundStacking()public onlyAdmin{
-        if (time< ""){
-            revert("Error: Not an Admin");
+
+    function fundPool(string memory pool)public onlyAdmin{
+        if (block.timestamp < fundingTime[pool]){
+            revert("Error: Too early");
         }
-        _transfer(address(this), stakingPool, 100* 10 ** decimals());
+        if(funded[pool]==true){
+            revert("Errror: Already funded");
+        }
+        if(poolAddress[pool]==address(0)){
+            revert("Errror: Pool not initialised");
+        }
+
+        _transfer(address(this), poolAddress[pool], amountToFund[pool] * 10 ** decimals());
+        funded[pool]= true;
     }
 
 
