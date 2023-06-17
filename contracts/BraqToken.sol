@@ -12,11 +12,17 @@ contract Braq is ERC20, Ownable {
     address public claimingPool;
 
     mapping(address => bool) public admins;
-
+    mapping(address => bool) public funded;
     // Modifier to restrict access to admins only
     modifier onlyAdmin() {
         require(admins[msg.sender], "Only admins can call this function.");
         _;
+    }
+
+    
+    constructor() ERC20("Braq", "BRQ") {
+        _mint(address(this), 150000000 * 10 ** decimals());
+        admins[msg.sender] = true;
     }
 
     // Function to add an admin
@@ -29,8 +35,18 @@ contract Braq is ERC20, Ownable {
         admins[_admin] = false;
     }
     
-    constructor() ERC20("Braq", "BRQ") {
-        _mint(address(this), 150000000 * 10 ** decimals());
+    function fundEcosystem(address pool)public onlyAdmin{
+        if (time< ""){
+            revert("Error: Not an Admin");
+        }
+        _transfer(address(this), ecosystemPool, 100* 10 ** decimals());
+        funded[pool]= true;
+    }
+    function fundStacking()public onlyAdmin{
+        if (time< ""){
+            revert("Error: Not an Admin");
+        }
+        _transfer(address(this), stakingPool, 100* 10 ** decimals());
     }
 
 
