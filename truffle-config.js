@@ -6,11 +6,17 @@ const privateKey = process.env.WALLET_PRIVATE_KEY;
 
 module.exports = {
   networks: {
-    live: {
+    mainnet: {
       provider: function () {
-        return new HDWalletProvider([privateKey], 'https://rpc.chiado.gnosis.gateway.fm')
+        return new HDWalletProvider([privateKey], "https://mainnet.infura.io/v3/cc8cc7e34bb440b19e75b2910913a25e")
       },
-      network_id: 10200,
+      network_id: 1
+    },
+    testnet: {
+      provider: function () {
+        return new HDWalletProvider([privateKey], 'https://sepolia.infura.io/v3/cc8cc7e34bb440b19e75b2910913a25e')
+      },
+      network_id: 11155111,
       /*host: "178.25.19.88", // Random IP for example purposes (do not use)
       port: 80,
       network_id: 1,        // Ethereum public network,
