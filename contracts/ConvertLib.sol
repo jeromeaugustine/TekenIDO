@@ -1,4 +1,5 @@
-pragma solidity >=0.4.25 <0.6.0;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.9;
 
 library ConvertLib{
     function convert(uint amount,uint conversionRate) public pure returns (uint convertedAmount)
