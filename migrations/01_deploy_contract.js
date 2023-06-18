@@ -1,5 +1,5 @@
-var BraqToken = artifacts.require("./BraqToken.sol");
+const Braq = artifacts.require("./BraqToken.sol");
 
 module.exports = function(deployer) {
-  deployer.deploy(BraqToken);
+  deployer.deploy(Braq);
 };
