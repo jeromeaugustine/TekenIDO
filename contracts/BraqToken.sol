@@ -8,15 +8,15 @@ contract BraqToken is ERC20, Ownable {
 
     uint256 public publicSaleSupply = 10;
     mapping(address => bool) public admins;
-
+    
     struct Pool {
         mapping(uint8 => bool) funded;
         mapping(uint8 => uint256) amountToFund;  // In BraqTokens, multiply by decimals()
-        mapping(uint8 => uint256) fundingTime;
         address poolAddress;
     }
     enum Pools {Rewards, Incentives, Listings, Team, Marketing, Private, Ecosystem}
     mapping (Pools => Pool) public pools;
+    mapping(uint8 => uint256) fundingTime;
 
     // Modifier to restrict access to admins only
     modifier onlyAdmin() {
@@ -28,6 +28,26 @@ contract BraqToken is ERC20, Ownable {
         // minting only public sale tokens
         _mint(address(this), publicSaleSupply * 10 ** decimals());
         admins[msg.sender] = true;
+
+        // Setting quarter timestamps
+        // 16 quarters
+        fundingTime[1] = 1688137200;
+        fundingTime[2] = 1696086000;
+        fundingTime[3] = 1704034800;
+        fundingTime[4] = 1711897200;
+        fundingTime[5] = 1719759600;
+        fundingTime[6] = 1727708400;
+        fundingTime[7] = 1735657200;
+        fundingTime[8] = 1743433200;
+        fundingTime[9] = 1751295600;
+        fundingTime[10] = 1759244400;
+        fundingTime[11] = 1767193200;
+        fundingTime[12] = 1774969200;
+        fundingTime[13] = 1782831600;
+        fundingTime[14] = 1790780400;
+        fundingTime[15] = 1798729200;
+        fundingTime[16] = 1806505200;
+ 
         // Setting Pools
         // Ecosystem
         for (uint8 i = 0; i < 5; i++) {
@@ -41,6 +61,10 @@ contract BraqToken is ERC20, Ownable {
         }
         // Rewards
         
+    }
+
+    function mint(address to, uint256 amount) external onlyOwner {
+        _mint(to, amount);
     }
 
     // Function to add an admin
@@ -63,7 +87,7 @@ contract BraqToken is ERC20, Ownable {
     }
     // Quarters counted from July 2023
     function fundPool(Pools _pool, uint8 _quarter) external onlyAdmin {
-        if (block.timestamp < pools[_pool].fundingTime[_quarter]){
+        if (block.timestamp < fundingTime[_quarter]){
             revert("Error: Too early");
         }
         require(pools[_pool].funded[_quarter] == false, "Errror: Already funded");
