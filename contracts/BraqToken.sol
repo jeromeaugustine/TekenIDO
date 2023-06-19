@@ -87,6 +87,7 @@ contract BraqToken is ERC20, Ownable {
     }
     // Quarters counted from July 2023
     function fundPool(Pools _pool, uint8 _quarter) external onlyAdmin {
+        require(_quarter>0 && _quarter<17, "Wrong quarter value");
         if (block.timestamp < fundingTime[_quarter]){
             revert("Error: Too early");
         }
