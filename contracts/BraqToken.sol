@@ -7,15 +7,16 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract BraqToken is ERC20, Ownable {
 
     uint256 public publicSaleSupply = 10;
-    
     mapping(address => bool) public admins;
 
+    struct Pool {
+        mapping(uint8 => bool) funded;
+        mapping(uint8 => uint256) amountToFund;  // In BraqTokens, multiply by decimals()
+        mapping(uint8 => uint256) fundingTime;
+        address poolAddress;
+    }
     enum Pools {Rewards, Incentives, Listings, Team, Marketing, Private, Ecosystem}
-    
-    mapping(Pools => mapping(uint8 => bool)) public funded;
-    mapping(Pools => address) public poolAddress;
-    mapping(Pools => mapping(uint8 => uint256)) public amountToFund; // In BraqTokens, multiply by decimals()
-    mapping(Pools => mapping(uint8 => uint256)) public fundingTime;
+    mapping (Pools => Pool) public pools;
 
     // Modifier to restrict access to admins only
     modifier onlyAdmin() {
@@ -30,13 +31,13 @@ contract BraqToken is ERC20, Ownable {
         // Setting Pools
         // Ecosystem
         for (uint8 i = 0; i < 5; i++) {
-            amountToFund[Pools.Ecosystem][i]=5 * 10 ** 6;
+            pools[Pools.Ecosystem].amountToFund[i]=5 * 10 ** 6;
         }
         for (uint8 i = 5; i < 9; i++) {
-            amountToFund[Pools.Ecosystem][i]= 2.5 * 10 ** 6;
+            pools[Pools.Ecosystem].amountToFund[i]= 25 * 10 ** 5;
         }
         for (uint8 i = 10; i < 17; i++) {
-            amountToFund[Pools.Ecosystem][i]= 1.25 * 10 ** 6;
+            pools[Pools.Ecosystem].amountToFund[i]= 125 * 10 ** 4;
         }
         // Rewards
         
@@ -52,21 +53,24 @@ contract BraqToken is ERC20, Ownable {
         admins[_admin] = false;
     }
     
-    function setPoolAddress(Pools pool, address adr) external onlyAdmin {
-        require(adr != address(0), "Error: Insert a valid address");
-        poolAddress[pool]=adr;
+    function setPoolAddress(Pools _pool, address _address) external onlyAdmin {
+        require(_address != address(0), "Error: Insert a valid address");
+        pools[_pool].poolAddress=_address;
     }
 
+    function getPoolAddress(Pools _pool) external view returns (address) { 
+        return pools[_pool].poolAddress;
+    }
     // Quarters counted from July 2023
-    function fundPool(Pools pool, uint8 quarter) external onlyAdmin {
-        if (block.timestamp < fundingTime[pool][quarter]){
+    function fundPool(Pools _pool, uint8 _quarter) external onlyAdmin {
+        if (block.timestamp < pools[_pool].fundingTime[_quarter]){
             revert("Error: Too early");
         }
-        require(funded[pool][quarter] == false, "Errror: Already funded");
-        require(poolAddress[pool] != address(0), "Errror: Pool not initialised");
+        require(pools[_pool].funded[_quarter] == false, "Errror: Already funded");
+        require(pools[_pool].poolAddress != address(0), "Errror: Pool not initialised");
 
-        _mint(poolAddress[pool], amountToFund[pool][quarter] * 10 ** decimals());
-        funded[pool][quarter]= true;
+        _mint(pools[_pool].poolAddress, pools[_pool].amountToFund[_quarter] * 10 ** decimals());
+        pools[_pool].funded[_quarter]= true;
     }
 
     function publicSale() public payable {
