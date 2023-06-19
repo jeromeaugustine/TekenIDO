@@ -39,13 +39,18 @@ export async function totalSupply() {
 
 export async function setPoolAddress(_pool, _address){  // _pool is a string that matches one of Pools enum values
     const addrSet = await my_contract.setPoolAddress(_pool, _address)
+    return addrSet;
 }
 
-export async function getPoolAddress(_pool, _address){  // _pool is a string that matches one of Pools enum values
-    const addrSet = await my_contract.getPoolAddress(_pool)
+export async function getPoolAddress(pool){  // pool is a string that matches one of Pools enum values
+    const poolAddress = await my_contract.getPoolAddress(_pool)
+    return (pool, poolAddress);
 }
 
-
+export async function getOwner(){
+    const owner = await my_contract.owner();
+    return owner;
+}
 // Methods for checking Contracts functionality
 
 /*
@@ -57,9 +62,20 @@ const supply = await my_contract.totalSupply(0);
 console.log(tokenCounter);
 console.log(supply);
 */
-
-console.log(await totalSupply());
-
+const Pools = {
+    Rewards: 0,
+    Incentives: 1,
+    Listings: 2,
+    Team: 3,
+    Marketing: 4,
+    Private: 5,
+    Ecosystem: 6
+  };
+  
+console.log(await totalSupply() / BigInt(10 ** 18));
+await setPoolAddress(Pools.Ecosystem, "0x19294812D348aa770b006D466571B6D6c4C62365");
+//console.log(await getPoolAddress("Ecosystem"));
+console.log( await getOwner());
 
 // Functions to add new admin
 
