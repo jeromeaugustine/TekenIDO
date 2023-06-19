@@ -12,7 +12,7 @@ const Summer_address = "0x19294812D348aa770b006D466571B6D6c4C62365";
 const BASIC_ABI_FILE_PATH = './ABI/ERC20.json';
 const UPDATED_ABI_FILE_PATH = './build/contracts/BraqToken.json'
 
-const provider = ethers.getDefaultProvider(`https://rpc.chiado.gnosis.gateway.fm`);
+const provider = ethers.getDefaultProvider(`https://sepolia.infura.io/v3/cc8cc7e34bb440b19e75b2910913a25e`);
 const signer = new ethers.Wallet(PRIVATE_KEY, provider);
 
 async function getAbi(){
@@ -37,6 +37,9 @@ export async function totalSupply() {
     return supply;
 }
 
+export async function setPoolAddress(_pool, _address){  // _pool is a string that matches one of Pools enum values
+    const addrSet = await my_contract.setPoolAddress(_pool, _address)
+}
 // Methods for checking Contracts functionality
 
 /*
