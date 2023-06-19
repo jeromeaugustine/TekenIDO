@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 import { config as loadEnv } from 'dotenv';
 import { promises } from "fs";
@@ -15,16 +16,15 @@ const UPDATED_ABI_FILE_PATH = './build/contracts/BraqToken.json'
 const provider = ethers.getDefaultProvider(`https://sepolia.infura.io/v3/cc8cc7e34bb440b19e75b2910913a25e`);
 const signer = new ethers.Wallet(PRIVATE_KEY, provider);
 
-async function getAbi(){
+async function getContract(){
     const data = await fsPromises.readFile(UPDATED_ABI_FILE_PATH, 'utf8');
     const abi = JSON.parse(data)['abi'];
     //console.log(abi);
-    return abi;
+    return new ethers.Contract(UPDATED_CONTRACT_ADDRESS, abi, signer);
 }
-const abi = await getAbi();
 
 //const my_contract = new ethers.Contract(DEPLOYED_CONTRACT_ADDRESS, abi, signer);
-const my_contract = new ethers.Contract(UPDATED_CONTRACT_ADDRESS, abi, signer);
+const my_contract = await getContract();
 //console.log(my_contract);
 
 async function addAdmin(adminAddress) {
@@ -40,6 +40,12 @@ export async function totalSupply() {
 export async function setPoolAddress(_pool, _address){  // _pool is a string that matches one of Pools enum values
     const addrSet = await my_contract.setPoolAddress(_pool, _address)
 }
+
+export async function getPoolAddress(_pool, _address){  // _pool is a string that matches one of Pools enum values
+    const addrSet = await my_contract.getPoolAddress(_pool)
+}
+
+
 // Methods for checking Contracts functionality
 
 /*
@@ -51,12 +57,9 @@ const supply = await my_contract.totalSupply(0);
 console.log(tokenCounter);
 console.log(supply);
 */
-//const exists = await my_contract.exists(10);
-//console.log(exists);
-//const paused = pause();
-//const unpaused = unpause();
-//console.log(await totalSupply(1));
-//console.log(await tokenCounter());
+
+console.log(await totalSupply());
+
 
 // Functions to add new admin
 
