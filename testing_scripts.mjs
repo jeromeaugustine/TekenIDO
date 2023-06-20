@@ -7,7 +7,7 @@ loadEnv();
 
 const PRIVATE_KEY = process.env.WALLET_PRIVATE_KEY;
 const BASIC_CONTRACT_ADDRESS = "0x34bf23FFB6Fe39fc3Bf4a21f08690a8652653b50";
-const UPDATED_CONTRACT_ADDRESS = "0x3769cc9680d98EcF13D6a153Dd612F5Ac87B1379";
+const UPDATED_CONTRACT_ADDRESS = "0xAa087a1e4D2089558EB7d82CE6FF7A9a21f84fFe";
 const my_address = "0x6f9e2777D267FAe69b0C5A24a402D14DA1fBcaA1";
 const Summer_address = "0x19294812D348aa770b006D466571B6D6c4C62365";
 const BASIC_ABI_FILE_PATH = './ABI/ERC20.json';
@@ -43,25 +43,23 @@ export async function setPoolAddress(_pool, _address){  // _pool is a string tha
 }
 
 export async function getPoolAddress(pool){  // pool is a string that matches one of Pools enum values
-    const poolAddress = await my_contract.getPoolAddress(_pool)
+    const poolAddress = await my_contract.getPoolAddress(pool)
     return (pool, poolAddress);
 }
 
+async function mintTokens(_to, _amount){
+
+}
 export async function getOwner(){
     const owner = await my_contract.owner();
     return owner;
 }
 // Methods for checking Contracts functionality
 
-/*
+
 const mint = await mintToken(my_address);
 const receipt = await provider.waitForTransaction(mint.hash);
-console.log('Transaction confirmed in block:', receipt.blockNumber);
-const tokenCounter = await my_contract.tokenCounter();
-const supply = await my_contract.totalSupply(0);
-console.log(tokenCounter);
-console.log(supply);
-*/
+
 const Pools = {
     Rewards: 0,
     Incentives: 1,
@@ -74,8 +72,8 @@ const Pools = {
   
 console.log(await totalSupply() / BigInt(10 ** 18));
 await setPoolAddress(Pools.Ecosystem, "0x19294812D348aa770b006D466571B6D6c4C62365");
-//console.log(await getPoolAddress("Ecosystem"));
-console.log( await getOwner());
+console.log("Ecosystem ", await getPoolAddress(Pools.Ecosystem));
+console.log( "Owner ", await getOwner());
 
 // Functions to add new admin
 
