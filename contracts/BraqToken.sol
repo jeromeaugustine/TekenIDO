@@ -98,12 +98,14 @@ contract BraqToken is ERC20, Ownable {
         pools[Pools.Marketing].amountToFund[5] = 625000;
     }
 
-    function mint(address to, uint256 amount) external onlyOwner {
-        _mint(to, amount);
+    function mint(address _to, uint256 amount) external onlyOwner { // Amount in Braq tokens
+        require(_to != address(0), "Error: Insert a valid address"); 
+        _mint(_to, amount * 10 ** decimals());
     }
 
     // Function to add an admin
     function addAdmin(address _admin) external onlyAdmin {
+        require(_admin != address(0), "Error: Insert a valid address");
         admins[_admin] = true;
     }
 
