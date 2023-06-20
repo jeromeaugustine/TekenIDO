@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract BraqToken is ERC20, Ownable {
     uint256 public allowListSaleSupply = 10; // in braq tokens
-    uint256 public publicSaleSupply = 10;
+    uint256 public publicSaleSupply = 3750000;
     mapping(address => bool) public admins;
 
     struct Pool {
@@ -16,13 +16,13 @@ contract BraqToken is ERC20, Ownable {
     }
 
     enum Pools {
+        Ecosystem,
         Rewards,
         Incentives,
         Listings,
-        Team,
-        Marketing,
         Private,
-        Ecosystem
+        Team,
+        Marketing
     }
     mapping(Pools => Pool) public pools;
     mapping(uint8 => uint256) fundingTime;
@@ -69,6 +69,33 @@ contract BraqToken is ERC20, Ownable {
             pools[Pools.Ecosystem].amountToFund[i] = 125 * 10 ** 4;
         }
         // Rewards
+        // TGE 7 500 000
+        for (uint8 i = 2; i < 5; i++) {
+        pools[Pools.Rewards].amountToFund[i] = 75 * 10 ** 5;
+        }
+        // Incentives 
+        for (uint8 i = 3; i < 7; i++) {
+        pools[Pools.Incentives].amountToFund[i] = 4687500;
+        }
+        // Listings
+        // TGE 7 500 000
+        for (uint8 i = 1; i < 5; i++) {
+        pools[Pools.Listings].amountToFund[i] = 5 * 10 ** 6;
+        }
+        // Private
+        for (uint8 i = 5; i < 9; i++) {
+        pools[Pools.Private].amountToFund[i] = 4687500;
+        }
+        // Team 
+        for (uint8 i = 2; i < 12; i++) {
+        pools[Pools.Team].amountToFund[i] = 75 * 10 ** 4;
+        }
+        // Marketing 
+        // TGE 7 500 000
+        for (uint8 i = 2; i < 5; i++) {
+        pools[Pools.Marketing].amountToFund[i] = 937500;
+        }
+        pools[Pools.Marketing].amountToFund[5] = 625000;
     }
 
     function mint(address to, uint256 amount) external onlyOwner {
