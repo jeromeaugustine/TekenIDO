@@ -27,11 +27,15 @@ async function getContract(){
 const my_contract = await getContract();
 //console.log(my_contract);
 
-async function addAdmin(adminAddress) {
+export async function addAdmin(adminAddress) {
     const newAdmin = await my_contract.addAdmin(adminAddress);
     return newAdmin;
 }
 
+export async function removeAddmin(admin){
+    const removed = await my_contract.removeAddmin(admin);
+    return removed;
+}
 export async function totalSupply() {
     const supply = await my_contract.totalSupply();
     return supply;
@@ -47,18 +51,25 @@ export async function getPoolAddress(pool){  // pool is a string that matches on
     return (pool, poolAddress);
 }
 
-async function mintTokens(_to, _amount){
-
+export async function fundPool(pool, quarter){
+    const funded = await my_contract.fundPool(pool, )
 }
+async function mintTokens(_to, _amount){
+    const mint = await my_contract.mint(_to, amount);
+    return mint;
+}
+
 export async function getOwner(){
     const owner = await my_contract.owner();
     return owner;
 }
+
 // Methods for checking Contracts functionality
 
-
-const mint = await mintToken(my_address);
+/*
+const mint = await mintTokens(my_address);
 const receipt = await provider.waitForTransaction(mint.hash);
+*/
 
 const Pools = {
     Rewards: 0,
