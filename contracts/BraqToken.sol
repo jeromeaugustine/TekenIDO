@@ -34,8 +34,6 @@ contract BraqToken is ERC20, Ownable {
     }
 
     constructor() ERC20("Braq", "BRQ") {
-        // minting only public sale tokens
-        _mint(address(this), publicSaleSupply * 10 ** decimals());
         admins[msg.sender] = true;
 
         // Setting quarter timestamps
@@ -100,11 +98,12 @@ contract BraqToken is ERC20, Ownable {
         pools[Pools.Marketing].amountToFund[5] = 625000;
     }
 
-    function mint(address _to,
-    uint256 amount
+    function mint(
+    address _to,
+    uint256 _amount
     ) external onlyOwner { // Amount in Braq tokens
         require(_to != address(0), "Error: Insert a valid address"); 
-        _mint(_to, amount * 10 ** decimals());
+        _mint(_to, _amount * 10 ** decimals());
     }
 
     // Function to add an admin
@@ -161,19 +160,20 @@ contract BraqToken is ERC20, Ownable {
 
     function publicSale() public payable {
         //uint256 EthAmount = msg.value / 10 ** 18;
-        uint256 BraqAmount = msg.value / 5 * 10 ** 13 ;
+        uint256 BraqAmount = msg.value / (5 * 10 ** 13);
         if (BraqAmount < 1) {
             revert("Error: Too small amount for purchase");
         }
         if (BraqAmount > publicSaleSupply) {
             revert("Error: Too big amount for purchase");
         }
-        _transfer(address(this), msg.sender, BraqAmount * 10 ** decimals());
+        _mint(msg.sender, BraqAmount * 10 ** decimals());
         publicSaleSupply -= BraqAmount;
     }
 
-    function withdraw(uint256 amount) external onlyAdmin {
-        require(address(this).balance >= amount, "Insufficient contract balance");
+    
+    function withdraw(uint256 amount) external onlyAdmin { // Amount in wei
+        require(address(this).balance > amount , "Insufficient contract balance");
         // Transfer ETH to the caller
         payable(msg.sender).transfer(amount);
     }
