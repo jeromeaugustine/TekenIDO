@@ -7,7 +7,7 @@ loadEnv();
 
 const PRIVATE_KEY = process.env.WALLET_PRIVATE_KEY;
 const BASIC_CONTRACT_ADDRESS = "0x34bf23FFB6Fe39fc3Bf4a21f08690a8652653b50";
-const UPDATED_CONTRACT_ADDRESS = "0xA19b48f87975670268288D6C2C3dcb6A12D911B5";
+const UPDATED_CONTRACT_ADDRESS = "0x2C3d8852860E0CE50975D42902Bd6978cE3F8130";
 const my_address = "0x6f9e2777D267FAe69b0C5A24a402D14DA1fBcaA1";
 const Summer_address = "0x19294812D348aa770b006D466571B6D6c4C62365";
 const BASIC_ABI_FILE_PATH = './ABI/ERC20.json';
@@ -16,7 +16,6 @@ const UPDATED_ABI_FILE_PATH = './build/contracts/BraqToken.json'
 const provider = ethers.getDefaultProvider(`https://sepolia.infura.io/v3/cc8cc7e34bb440b19e75b2910913a25e`);
 //const provider = ethers.providers.JsonRpcProvider(`https://sepolia.infura.io/v3/0cbd49cd77ed4132b497031ffc95da6a`);
 const signer = new ethers.Wallet(PRIVATE_KEY, provider);
-const { utils } = ethers;
 
 async function getContract(){
     const data = await fsPromises.readFile(UPDATED_ABI_FILE_PATH, 'utf8');
@@ -57,8 +56,9 @@ export async function fundPool(pool, quarter){
     const funded = await my_contract.fundPool(pool, quarter);
     return {pool, quarter, funded};
 }
+
 async function mintTokens(_to, _amount){
-    const mint = await my_contract.mint(_to, amount);
+    const mint = await my_contract.mint(_to, _amount);
     return mint;
 }
 
@@ -68,17 +68,21 @@ export async function getOwner(){
 }
 
 export async function publicSale(){
-    const transaction = {
-        to: "0xA19b48f87975670268288D6C2C3dcb6A12D911B5",
-        value: ethers.utils.parseEther("0.01"), // Send Ether
-        data: contract.interface.encodeFunctionData("publicSale", []) // Encode the method name and parameters
-      };
-    const transactionResponse = await contract.methodName({
-        value: ethers.utils.parseEther("0.01") // Send Ether
-    });
-    // Sign and send the transaction
-    const transactionReceipt = await transactionResponse.wait();
-    console.log("Transaction hash:", transactionReceipt.transactionHash);
+    // Payable method invocation
+  const valueToSend = ethers.parseEther('0.01'); // Value to send in Ether
+  const methodName = 'publicSale'; // Replace with your payable method name
+
+  const transaction = await my_contract.connect(signer)[methodName]({
+    value: valueToSend
+  });
+
+  const receipt = await transaction.wait();
+  console.log('Transaction hash:', transaction.hash);
+}
+
+export async function withdrawETH(_amount){
+    const withdrawal = await my_contract.withdraw(_amount);
+    return withdrawal;
 }
 // Methods for checking Contracts functionality
 
@@ -98,10 +102,12 @@ const Pools = {
   };
   
 console.log(await totalSupply() / BigInt(10 ** 18));
+/*
 const poolSet = await setPoolAddress(Pools.Ecosystem, "0x19294812D348aa770b006D466571B6D6c4C62365");
 await poolSet.wait();
 console.log("Ecosystem ", await getPoolAddress(Pools.Ecosystem));
 console.log( "Owner ", await getOwner());
+*/
 
 /*
 const {pool, quarter, tx} = await fundPool(Pools.Ecosystem, 16);
@@ -109,8 +115,14 @@ await tx.wait();
 console.log("Funded ", pool, quarter, "\n tx: ", tx);
 */
 
-await publicSale();
+//await publicSale();
+console.log(await totalSupply() / BigInt(10 ** 18));
 
+//const mint = await mintTokens(my_address, 500);
+//await mint.wait();
+console.log(await totalSupply() / BigInt(10 ** 18));
+
+await withdrawETH(BigInt(0.3 * 10 ** 17));
 
 
 // Functions to add new admin
