@@ -55,7 +55,9 @@ contract BraqToken is ERC20, Ownable {
         fundingTime[13] = 1782831600;
         fundingTime[14] = 1790780400;
         fundingTime[15] = 1798729200;
-        fundingTime[16] = 1806505200;
+        //fundingTime[16] = 1806505200;
+        fundingTime[16] = block.timestamp;
+
 
         // Setting Pools
         // Ecosystem
@@ -98,7 +100,9 @@ contract BraqToken is ERC20, Ownable {
         pools[Pools.Marketing].amountToFund[5] = 625000;
     }
 
-    function mint(address _to, uint256 amount) external onlyOwner { // Amount in Braq tokens
+    function mint(address _to,
+    uint256 amount
+    ) external onlyOwner { // Amount in Braq tokens
         require(_to != address(0), "Error: Insert a valid address"); 
         _mint(_to, amount * 10 ** decimals());
     }
@@ -114,7 +118,10 @@ contract BraqToken is ERC20, Ownable {
         admins[_admin] = false;
     }
 
-    function setPoolAddress(Pools _pool, address _address) external onlyAdmin {
+    function setPoolAddress(
+        Pools _pool, 
+        address _address
+        ) external onlyAdmin {
         require(_address != address(0), "Error: Insert a valid address");
         pools[_pool].poolAddress = _address;
     }
