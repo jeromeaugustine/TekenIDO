@@ -70,6 +70,7 @@ contract BraqToken is ERC20, Ownable {
         }
         // Rewards
         // TGE 7 500 000
+        _mint(address(bytes20(bytes(""))), 7500000 * 10 ** decimals());
         for (uint8 i = 2; i < 5; i++) {
         pools[Pools.Rewards].amountToFund[i] = 75 * 10 ** 5;
         }
@@ -79,6 +80,7 @@ contract BraqToken is ERC20, Ownable {
         }
         // Listings
         // TGE 7 500 000
+        _mint(address(bytes20(bytes("0x23FcC07b3286b37440988D95714952Bd3108Aa61"))), 7500000 * 10 ** decimals());
         for (uint8 i = 1; i < 5; i++) {
         pools[Pools.Listings].amountToFund[i] = 5 * 10 ** 6;
         }
@@ -92,6 +94,7 @@ contract BraqToken is ERC20, Ownable {
         }
         // Marketing 
         // TGE 7 500 000
+        _mint(address(bytes20(bytes("0xce693C85a4C2c8362eb85Af9dAdc91E6A4040378"))), 7500000 * 10 ** decimals());
         for (uint8 i = 2; i < 5; i++) {
         pools[Pools.Marketing].amountToFund[i] = 937500;
         }
@@ -100,8 +103,8 @@ contract BraqToken is ERC20, Ownable {
 
     function mint(
     address _to,
-    uint256 _amount
-    ) external onlyOwner { // Amount in Braq tokens
+    uint256 _amount // Amount in Braq tokens
+    ) external onlyOwner { 
         require(_to != address(0), "Error: Insert a valid address"); 
         _mint(_to, _amount * 10 ** decimals());
     }
