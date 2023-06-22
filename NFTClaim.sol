@@ -3,8 +3,12 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+interface BraqToken {
+    function transfer(address to, uint256 amount) external returns (bool);
+    // Include other necessary functions like balanceOf, allowance, etc.
+}
+
 contract NFTClaim is Ownable {
-    mapping(address => uint256) public tokenBalances;
     mapping(uint8 => mapping(uint256 => bool)) public frinedsClaimed;
     mapping(uint8 => mapping(uint256 => bool)) public monstersClaimed;
 
