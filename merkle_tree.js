@@ -13,46 +13,49 @@ const fs = require("fs");
 // Alice, Bob and Carol's data respectively
 export async function getRoot(){
 
-const csvData = await new Promise((resolve, reject) => {
-  fs.readFile('whiteList.csv','utf8', (error, data) => {
-    if (error) {
-      reject(error);
-      return;
-    }
-    resolve(data);
+  const csvData = await new Promise((resolve, reject) => {
+    fs.readFile('whiteList1.csv','utf8', (error, data) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+      resolve(data);
+    });
   });
-});
-
-const rows = csvData.split('\n');
-  // Process the data or perform further operations
-const whiteList = rows.map((address) => {
-    return { address };
-  });  
-console.log(whiteList);
-
-// create leaves from users' address and quantity
-const leaves = whiteList.map((x) =>
-  ethers.solidityPackedKeccak256(
-    ["address"],
-    [x.address]
-  )
-);
-
-// create a Merkle tree
-const tree = new MerkleTree(leaves, keccak256, { sort: true });
-console.log(tree.toString());
-const merkleProof = leaves.map(leaf => tree.getHexProof(leaf));
-console.log("HexProofs ", merkleProofs);
-const root = tree.getHexRoot();
-/*
-const merkleProof = await hexProofs.map(proof => proof.map((hexString) => { 
-  const normalizedHexString = hexString.replace(/^0x/, "").padStart(64, "0");
-  return "0x" + normalizedHexString;
-})
-console.log("bytes32", merkleProof);
-);
-*/
-console.log("Root", root);
-return {root, merkleProof};
-}
-//getRoot();
+  
+  const rows = csvData.split('\n');
+    // Process the data or perform further operations
+  const whiteList = rows.map((address) => {
+      return { address };
+    });  
+  console.log(whiteList);
+  
+  // create leaves from users' address and quantity
+  const leaves = whiteList.map((x) =>
+    ethers.solidityPackedKeccak256(
+      ["address"],
+      [x.address]
+    )
+  );
+  
+  // create a Merkle tree
+  const tree = new MerkleTree(leaves, keccak256, { sort: true });
+  console.log("tree ", tree.toString());
+  const merkleProof = leaves.map(leaf => tree.getHexProof(leaf));
+  console.log("HexProofs ", merkleProof);
+  const proofArray = merkleProof.flat();
+  console.log("Merkle Proof", proofArray);
+  console.log(typeof(proofArray));
+  const root = tree.getHexRoot();
+  /*
+  const merkleProof = await hexProofs.map(proof => proof.map((hexString) => { 
+    const normalizedHexString = hexString.replace(/^0x/, "").padStart(64, "0");
+    return "0x" + normalizedHexString;
+  })
+  console.log("bytes32", merkleProof);
+  );
+  */
+  console.log("Root", root);
+  return {root, merkleProof};
+  }
+  getRoot();
