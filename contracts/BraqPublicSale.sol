@@ -4,33 +4,35 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import {MerkleProof} from '@openzeppelin/contracts/utils/cryptography/MerkleProof.sol';
 
 contract BraqPublicSale is Ownable {
     bool publicSaleStarted = false;
     address private BraqTokenContractAddress;
     IERC20 private BraqTokenInstance;
-    bytes32 public merkleRoot;
-    bytes32[] private merkleProof = [bytes32(0x2cbe5f3f648a5053d4d46fbda12546e61f715922fde1706c03f09a1322c0e55c),bytes32(0xa71fe35280dddf213b918b21648d8ab3d653c85884ea9873e9409d66e9db5816)];
+    mapping(address => bool) public whitelist;
+    
     uint256 public publicSaleSupply = 3750000;
 
-    constructor(
-        address _BraqTokenContractAddress, 
-        bytes32 _merkleRoot
-        ) {
+    constructor(address _BraqTokenContractAddress) {
         BraqTokenContractAddress = _BraqTokenContractAddress;
         BraqTokenInstance = IERC20(_BraqTokenContractAddress);
-        merkleRoot = _merkleRoot;
         }
+
+    function addToWhitelist(address[] calldata toAddAddresses) 
+    external onlyOwner
+    {
+        for (uint i = 0; i < toAddAddresses.length; i++) {
+            whitelist[toAddAddresses[i]] = true;
+        }
+    }
 
     function startPublicSale() external onlyOwner{
         publicSaleStarted = true;
     }
 
-    function verify() public view returns(string memory) {
-        bytes32 node = keccak256(abi.encodePacked(msg.sender));
-        require(MerkleProof.verify(merkleProof, merkleRoot, node), 'Error: Invalid proof');
-        return "Proved";
+    function whitelistFunc() external view returns(string memory){
+        require(whitelist[msg.sender], "NOT_IN_WHITELIST");
+        return "In the WhiteList";
     }
     
     function publicSale() public payable {
@@ -47,6 +49,9 @@ contract BraqPublicSale is Ownable {
         publicSaleSupply -= BraqAmount;
     }
 
+    function getTokenAddress() public view returns(address){
+        return BraqTokenContractAddress;
+    }
     function withdraw(uint256 amount) external onlyOwner { // Amount in wei
         require(address(this).balance > amount , "Insufficient contract balance");
         // Transfer ETH to the caller
