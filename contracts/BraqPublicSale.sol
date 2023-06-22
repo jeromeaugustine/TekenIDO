@@ -11,18 +11,16 @@ contract BraqPublicSale is Ownable {
     address private BraqTokenContractAddress;
     IERC20 private BraqTokenInstance;
     bytes32 public merkleRoot;
-    bytes32[] private merkleProof;
+    bytes32[] private merkleProof = [bytes32(0x2cbe5f3f648a5053d4d46fbda12546e61f715922fde1706c03f09a1322c0e55c),bytes32(0xa71fe35280dddf213b918b21648d8ab3d653c85884ea9873e9409d66e9db5816)];
     uint256 public publicSaleSupply = 3750000;
 
     constructor(
         address _BraqTokenContractAddress, 
-        bytes32 _merkleRoot,
-        bytes32[] memory _merkleProof
+        bytes32 _merkleRoot
         ) {
         BraqTokenContractAddress = _BraqTokenContractAddress;
         BraqTokenInstance = IERC20(_BraqTokenContractAddress);
         merkleRoot = _merkleRoot;
-        merkleProof = _merkleProof;
         }
 
     function startPublicSale() external onlyOwner{

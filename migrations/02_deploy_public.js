@@ -1,15 +1,14 @@
-const Braq = artifacts.require("BraqToken.sol");
+const BraqToken = artifacts.require("BraqToken");
+const PublicSale = artifacts.require("PublicSale");
 const MerkleTree = require("merkletreejs").MerkleTree;
 const { ethers } = require("ethers");
 const keccak256 = require("keccak256");
 const fs = require("fs");
 
 module.exports = async function (deployer) {
-  const marketingPoolAddress = "0xce693C85a4C2c8362eb85Af9dAdc91E6A4040378";
-  const listingsPoolAddress = "0x23FcC07b3286b37440988D95714952Bd3108Aa61";
 
   const csvData = await new Promise((resolve, reject) => {
-    fs.readFile("whiteList.csv", "utf8", (error, data) => {
+    fs.readFile("whiteList1.csv", "utf8", (error, data) => {
       if (error) {
         reject(error);
         return;
@@ -36,5 +35,5 @@ module.exports = async function (deployer) {
   console.log("Root", root);
   console.log("Merkle Proofs", typeof(merkleProofs));
 
-  deployer.deploy(Braq, root, merkleProofs, listingsPoolAddress, marketingPoolAddress);
+  deployer.deploy(BraqToken.address, root, merkleProofs);
 };
