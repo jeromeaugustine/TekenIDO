@@ -3,12 +3,14 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import {MerkleProof} from '@openzeppelin/contracts/utils/cryptography/MerkleProof.sol';
 
 contract BraqToken is ERC20, Ownable {
     uint256 public allowListSaleSupply = 10; // in braq tokens
     uint256 public publicSaleSupply = 3750000;
+    bytes32 public merkleRoot;
     mapping(address => bool) public admins;
-
+    
     struct Pool {
         mapping(uint8 => bool) funded;
         mapping(uint8 => uint256) amountToFund; // In BraqTokens, multiply by decimals()
@@ -33,9 +35,15 @@ contract BraqToken is ERC20, Ownable {
         _;
     }
 
-    constructor() ERC20("Braq", "BRQ") {
+    constructor(
+        bytes32 merkleRoot_,
+        address listingsPoolAddress,
+        address marketingPoolAddress
+        ) ERC20("Braq", "BRQ") {
+        require(listingsPoolAddress != address(0), "Insert valid Listings Pool address");
+        require(marketingPoolAddress != address(0), "Insert valid Listings Pool address");
         admins[msg.sender] = true;
-
+        merkleRoot = merkleRoot_;
         // Setting quarter timestamps
         // 16 quarters
         fundingTime[1] = 1688137200;
@@ -56,8 +64,7 @@ contract BraqToken is ERC20, Ownable {
         //fundingTime[16] = 1806505200;
         fundingTime[16] = block.timestamp;
 
-
-        // Setting Pools
+        // Setting Pools' Funding
         // Ecosystem
         for (uint8 i = 0; i < 5; i++) {
             pools[Pools.Ecosystem].amountToFund[i] = 5 * 10 ** 6;
@@ -80,7 +87,7 @@ contract BraqToken is ERC20, Ownable {
         }
         // Listings
         // TGE 7 500 000
-        _mint(address(bytes20(bytes("0x23FcC07b3286b37440988D95714952Bd3108Aa61"))), 7500000 * 10 ** decimals());
+        _mint(listingsPoolAddress, 7500000 * 10 ** decimals());
         for (uint8 i = 1; i < 5; i++) {
         pools[Pools.Listings].amountToFund[i] = 5 * 10 ** 6;
         }
@@ -161,6 +168,11 @@ contract BraqToken is ERC20, Ownable {
         pools[_pool].funded[_quarter] = true;
     }
 
+    function verify(bytes32[] calldata merkleProof) public {
+        bytes32 node = keccak256(abi.encodePacked(msg.sender));
+        require(MerkleProof.verify(merkleProof, merkleRoot, node), 'invalid proof');
+
+    }
     function publicSale() public payable {
         //uint256 EthAmount = msg.value / 10 ** 18;
         uint256 BraqAmount = msg.value / (5 * 10 ** 13);
