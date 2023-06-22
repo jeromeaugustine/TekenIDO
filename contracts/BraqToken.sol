@@ -6,9 +6,11 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import {MerkleProof} from '@openzeppelin/contracts/utils/cryptography/MerkleProof.sol';
 
 contract BraqToken is ERC20, Ownable {
+    bool publicSaleStarted = false;
     uint256 public allowListSaleSupply = 10; // in braq tokens
     uint256 public publicSaleSupply = 3750000;
     bytes32 public merkleRoot;
+    bytes32[] private merkleProof;
     mapping(address => bool) public admins;
     
     struct Pool {
@@ -36,14 +38,17 @@ contract BraqToken is ERC20, Ownable {
     }
 
     constructor(
-        bytes32 merkleRoot_,
+        bytes32 _merkleRoot,
+        bytes32[] memory _merkleProof,
         address listingsPoolAddress,
         address marketingPoolAddress
         ) ERC20("Braq", "BRQ") {
         require(listingsPoolAddress != address(0), "Insert valid Listings Pool address");
         require(marketingPoolAddress != address(0), "Insert valid Listings Pool address");
         admins[msg.sender] = true;
-        merkleRoot = merkleRoot_;
+        merkleRoot = _merkleRoot;
+        merkleProof = _merkleProof;
+
         // Setting quarter timestamps
         // 16 quarters
         fundingTime[1] = 1688137200;
@@ -77,7 +82,6 @@ contract BraqToken is ERC20, Ownable {
         }
         // Rewards
         // TGE 7 500 000
-        _mint(address(bytes20(bytes(""))), 7500000 * 10 ** decimals());
         for (uint8 i = 2; i < 5; i++) {
         pools[Pools.Rewards].amountToFund[i] = 75 * 10 ** 5;
         }
@@ -101,7 +105,7 @@ contract BraqToken is ERC20, Ownable {
         }
         // Marketing 
         // TGE 7 500 000
-        _mint(address(bytes20(bytes("0xce693C85a4C2c8362eb85Af9dAdc91E6A4040378"))), 7500000 * 10 ** decimals());
+        _mint(marketingPoolAddress, 7500000 * 10 ** decimals());
         for (uint8 i = 2; i < 5; i++) {
         pools[Pools.Marketing].amountToFund[i] = 937500;
         }
@@ -118,7 +122,7 @@ contract BraqToken is ERC20, Ownable {
 
     // Function to add an admin
     function addAdmin(address _admin) external onlyAdmin {
-        require(_admin != address(0), "Error: Insert a valid address");
+        require(_admin != address(0), "Error: Insert a valid admin address");
         admins[_admin] = true;
     }
 
@@ -168,15 +172,20 @@ contract BraqToken is ERC20, Ownable {
         pools[_pool].funded[_quarter] = true;
     }
 
-    function verify(bytes32[] calldata merkleProof) public {
-        bytes32 node = keccak256(abi.encodePacked(msg.sender));
-        require(MerkleProof.verify(merkleProof, merkleRoot, node), 'invalid proof');
-
+    function startPublicSale() external onlyOwner{
+        publicSaleStarted = true;
     }
+    function verify() public view returns(string memory) {
+        bytes32 node = keccak256(abi.encodePacked(msg.sender));
+        require(MerkleProof.verify(merkleProof, merkleRoot, node), 'Error: Invalid proof');
+        return "Proved";
+    }
+
     function publicSale() public payable {
+        require(publicSaleStarted = true, "Public Sale not started yet!");
         //uint256 EthAmount = msg.value / 10 ** 18;
         uint256 BraqAmount = msg.value / (5 * 10 ** 13);
-        if (BraqAmount < 1) {
+        if (BraqAmount < 499) {
             revert("Error: Too small amount for purchase");
         }
         if (BraqAmount > publicSaleSupply) {
@@ -186,7 +195,6 @@ contract BraqToken is ERC20, Ownable {
         publicSaleSupply -= BraqAmount;
     }
 
-    
     function withdraw(uint256 amount) external onlyAdmin { // Amount in wei
         require(address(this).balance > amount , "Insufficient contract balance");
         // Transfer ETH to the caller
