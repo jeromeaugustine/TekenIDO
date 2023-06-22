@@ -84,6 +84,11 @@ export async function withdrawETH(_amount){
     const withdrawal = await my_contract.withdraw(_amount);
     return withdrawal;
 }
+
+export async function verify() {
+    const withdrawal = await my_contract.verify();
+    return withdrawal;
+}
 // Methods for checking Contracts functionality
 
 /*
@@ -108,7 +113,7 @@ await poolSet.wait();
 console.log("Ecosystem ", await getPoolAddress(Pools.Ecosystem));
 console.log( "Owner ", await getOwner());
 */
-
+console.log(await verify()); 
 /*
 const {pool, quarter, tx} = await fundPool(Pools.Ecosystem, 16);
 await tx.wait();
