@@ -32,11 +32,6 @@ contract BraqPublicSale is Ownable {
     function startPublicSale() external onlyOwner{
         publicSaleStarted = true;
     }
-
-    function whitelistFunc() external view returns(string memory){
-        require(whitelist[msg.sender], "NOT_IN_WHITELIST");
-        return "In the WhiteList";
-    }
     
     function justSell(uint256 value, address buyer) private {
         uint256 BraqAmount = uint256(value / (6 * 10 ** 13));
