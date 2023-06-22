@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import {MerkleProof} from '@openzeppelin/contracts/utils/cryptography/MerkleProof.sol';
 
-contract BraqToken is ERC20, Ownable {
+contract Ultimate is ERC20, Ownable {
     bool publicSaleStarted = false;
     uint256 public allowListSaleSupply = 10; // in braq tokens
     uint256 public publicSaleSupply = 3750000;
