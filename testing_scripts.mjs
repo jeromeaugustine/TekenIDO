@@ -2,57 +2,52 @@
 import { ethers } from "ethers";
 import { config as loadEnv } from 'dotenv';
 import { promises } from "fs";
+import fs from 'fs';
+import { createInterface } from 'readline';
 const fsPromises = promises;
 loadEnv();
 
 const PRIVATE_KEY = process.env.WALLET_PRIVATE_KEY;
-const TOKEN_CONTRACT_ADDRESS = "0x1a9cBc3bAe3716ba3865fE867825fb027751e1b4";
+const TOKEN_CONTRACT_ADDRESS = "0x54d5481C61e2394545EA55CE58706CB1bF260AA7";
+const SALE_CONTRACT_ADDRESS = "0x990166E78Fa1B54145437f5c1720Bc7C3DC8764C";
 const my_address = "0x6f9e2777D267FAe69b0C5A24a402D14DA1fBcaA1";
 const Summer_address = "0x19294812D348aa770b006D466571B6D6c4C62365";
-const UPDATED_ABI_FILE_PATH = './build/contracts/BraqToken.json'
+const TOKEN_ABI_FILE_PATH = './build/contracts/BraqToken.json';
+const SALE_ABI_FILE_PATH = './build/contracts/BraqPublicSale.json';
+const WHITELIST_CSV_PATH = './whiteList1.csv';
 
-const provider = ethers.getDefaultProvider(`https://sepolia.infura.io/v3/0cbd49cd77ed4132b497031ffc95da6a`);
+//const provider = ethers.getDefaultProvider(`https://sepolia.infura.io/v3/0cbd49cd77ed4132b497031ffc95da6a`);
+const provider = ethers.getDefaultProvider(`https://sepolia.infura.io/v3/b4ceed0a8862403d802e4bb169d3cb14`);
 const signer = new ethers.Wallet(PRIVATE_KEY, provider);
 
-async function getContract(contractAddress){
-    const data = await fsPromises.readFile(UPDATED_ABI_FILE_PATH, 'utf8');
+async function getContract(contractAddress, ABIfilePath){
+    const data = await fsPromises.readFile(ABIfilePath, 'utf8');
     const abi = JSON.parse(data)['abi'];
     //console.log(abi);
     return new ethers.Contract(contractAddress, abi, signer);
 }
+const token_contract = await getContract(TOKEN_CONTRACT_ADDRESS, TOKEN_ABI_FILE_PATH);
+const sale_contract = await getContract(SALE_CONTRACT_ADDRESS, SALE_ABI_FILE_PATH);
+//console.log(sale_contract);
 
-//const my_contract = new ethers.Contract(DEPLOYED_CONTRACT_ADDRESS, abi, signer);
-const token_contract = await getContract(TOKEN_CONTRACT_ADDRESS);
-//console.log(my_contract);
-
-export async function addAdmin(adminAddress) {
-    const newAdmin = await token_contract.addAdmin(adminAddress);
-    return newAdmin;
-}
-
-export async function removeAddmin(admin){
-    const removed = await token_contract.removeAddmin(admin);
-    return removed;
+async function readAddressesFromCSV(filePath) {
+    const addresses = [];
+    const fileStream = fs.createReadStream(filePath);
+    const rl = createInterface({
+      input: fileStream,
+      crlfDelay: Infinity
+    });
+    for await (const line of rl) {
+      const address = line.trim();
+      addresses.push(address);
+    }
+  
+    return addresses;
 }
 
 export async function totalSupply() {
     const supply = await token_contract.totalSupply();
     return supply;
-}
-
-export async function setPoolAddress(_pool, _address){  // _pool is a string that matches one of Pools enum values
-    const addrSet = await token_contract.setPoolAddress(_pool, _address)
-    return addrSet;
-}
-
-export async function getPoolAddress(pool){  // pool is a string that matches one of Pools enum values
-    const poolAddress = await token_contract.getPoolAddress(pool)
-    return (pool, poolAddress);
-}
-
-export async function fundPool(pool, quarter){
-    const funded = await token_contract.fundPool(pool, quarter);
-    return {pool, quarter, funded};
 }
 
 async function mintTokens(_to, _amount){
@@ -66,16 +61,16 @@ export async function getOwner(){
 }
 
 export async function startPublicSale(){
-    const started = await token_contract.startPublicSale();
-    return owner;
+    const started = await sale_contract.startPublicSale();
+    return started;
 }
 
 export async function publicSale(){
     // Payable method invocation
-    const valueToSend = ethers.parseEther('0.01'); // Value to send in Ether
+    const valueToSend = ethers.parseEther('0.03'); // Value to send in Ether
     const methodName = 'publicSale'; // Replace with your payable method name
 
-    const transaction = await token_contract.connect(signer)[methodName]({
+    const transaction = await sale_contract.connect(signer)[methodName]({
         value: valueToSend
     });
 
@@ -84,8 +79,17 @@ export async function publicSale(){
     }
 
 export async function withdrawETH(_amount){
-    const withdrawal = await token_contract.withdraw(_amount);
+    const withdrawal = await sale_contract.withdraw(_amount);
     return withdrawal;
+}
+
+export async function getTokenAddress(){
+    return await sale_contract.getTokenAddress();
+}
+
+export async function addToWhiteList(array){
+    const added = await sale_contract.addToWhitelist(array);
+    return added;
 }
 
 export async function verify() {
@@ -125,13 +129,18 @@ console.log("Funded ", pool, quarter, "\n tx: ", tx);
 */
 //await startPublicSale();
 //await publicSale();
-const mint_tx = await mintTokens("0x00472A3fB61ff30732adC787373238B47df90643", 3750000);
-mint_tx.wait();
-console.log(mint_tx);
+//const tokenAddress = await getTokenAddress();
+//console.log(tokenAddress)
+//const mint_tx = await mintTokens("0xC520944Bc9D498b7BeFE887300c501C1D9651B75", 3750000);
+//mint_tx.wait();
+//console.log(mint_tx);
+//const start = await startPublicSale();
 console.log(await totalSupply() / BigInt(10 ** 18));
-
+const array = await readAddressesFromCSV(WHITELIST_CSV_PATH);
+await addToWhiteList(array);
 //const mint = await mintTokens(my_address, 500);
 //await mint.wait();
+public 
 console.log(await totalSupply() / BigInt(10 ** 18));
 
 //await withdrawETH(BigInt(0.23 * 10 ** 18));
