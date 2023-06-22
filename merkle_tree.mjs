@@ -35,8 +35,8 @@ const leaves = whiteList.map((x) =>
 // create a Merkle tree
 const tree = new MerkleTree(leaves, keccak256, { sort: true });
 console.log(tree.toString());
-const hexProofs = leaves.map(leaf => tree.getHexProof(leaf));
-console.log("HexProofs ", hexProofs);
+const merkleProof = leaves.map(leaf => tree.getHexProof(leaf));
+console.log("HexProofs ", merkleProofs);
 const root = tree.getHexRoot();
 /*
 const merkleProof = await hexProofs.map(proof => proof.map((hexString) => { 
@@ -44,9 +44,9 @@ const merkleProof = await hexProofs.map(proof => proof.map((hexString) => {
   return "0x" + normalizedHexString;
 })
 console.log("bytes32", merkleProof);
-);*/
-
+);
+*/
 console.log("Root", root);
-return root;
+return root, merkleProof;
 }
 getRoot();
