@@ -10,13 +10,15 @@ module.exports = {
       provider: function () {
         return new HDWalletProvider([privateKey], "https://mainnet.infura.io/v3/cc8cc7e34bb440b19e75b2910913a25e")
       },
-      network_id: 1
+      network_id: 1,
+      networkCheckTimeout: 60000,
     },
     testnet: {
       provider: function () {
         return new HDWalletProvider([privateKey], 'https://sepolia.infura.io/v3/cc8cc7e34bb440b19e75b2910913a25e')
       },
       network_id: 11155111,
+      networkCheckTimeout: 60000,
       /*host: "178.25.19.88", // Random IP for example purposes (do not use)
       port: 80,
       network_id: 1,        // Ethereum public network,
