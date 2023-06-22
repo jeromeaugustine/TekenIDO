@@ -7,16 +7,19 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract BraqPublicSale is Ownable {
     bool publicSaleStarted = false;
+    mapping(address => bool) private whitelist;
+    
+    uint256 public allowListSupply = 2 * 10 ** 6;
+    uint256 public publicSaleSupply = 1750000;
     address private BraqTokenContractAddress;
     IERC20 private BraqTokenInstance;
-    mapping(address => bool) public whitelist;
-    
-    uint256 public publicSaleSupply = 3750000;
 
-    constructor(address _BraqTokenContractAddress) {
-        BraqTokenContractAddress = _BraqTokenContractAddress;
-        BraqTokenInstance = IERC20(_BraqTokenContractAddress);
-        }
+    constructor(){}
+
+    function setTokenContract(address tokenAddress) external onlyOwner{
+        BraqTokenContractAddress = tokenAddress;
+        BraqTokenInstance = IERC20(BraqTokenContractAddress);
+    }
 
     function addToWhitelist(address[] calldata toAddAddresses) 
     external onlyOwner
@@ -35,23 +38,34 @@ contract BraqPublicSale is Ownable {
         return "In the WhiteList";
     }
     
+    function justSell(uint256 value, address buyer) private {
+        uint256 BraqAmount = uint256(value / (6 * 10 ** 13));
+        require(BraqAmount<publicSaleSupply, "Error: Too big amount for purchase");
+        BraqTokenInstance.transfer(buyer, BraqAmount * 10 ** 18);
+        publicSaleSupply -= BraqAmount;}
+    
     function publicSale() public payable {
         require(publicSaleStarted, "Public Sale not started yet!");
-        //uint256 EthAmount = msg.value / 10 ** 18;
-        uint256 BraqAmount = msg.value / (5 * 10 ** 13);
-        if (BraqAmount < 499) {
-            revert("Error: Too small amount for purchase");
+        require(msg.value >= 0.025 * 10 ** 18, "Error: Too small amount for purchase");
+        if(whitelist[msg.sender]){
+            uint256 BraqAmount = msg.value / (5 * 10 ** 13);
+            if(BraqAmount<allowListSupply){
+                BraqTokenInstance.transfer(msg.sender, BraqAmount * 10 ** 18);
+                allowListSupply -= BraqAmount;
+            }
+            else{justSell(msg.value, msg.sender);}
         }
-        if (BraqAmount > publicSaleSupply) {
-            revert("Error: Too big amount for purchase");
-        }
-        BraqTokenInstance.transfer(msg.sender, BraqAmount * 10 ** 18);
-        publicSaleSupply -= BraqAmount;
+        else{justSell(msg.value, msg.sender);}
     }
 
-    function getTokenAddress() public view returns(address){
+    function getAllowListSupply() external view onlyOwner returns(uint256){
+        return allowListSupply;
+    }
+
+    function getTokenAddress() external view returns(address){
         return BraqTokenContractAddress;
     }
+
     function withdraw(uint256 amount) external onlyOwner { // Amount in wei
         require(address(this).balance > amount , "Insufficient contract balance");
         // Transfer ETH to the caller
