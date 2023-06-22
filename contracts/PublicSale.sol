@@ -29,6 +29,12 @@ contract BraqPublicSale is Ownable {
         publicSaleStarted = true;
     }
 
+    function verify() public view returns(string memory) {
+        bytes32 node = keccak256(abi.encodePacked(msg.sender));
+        require(MerkleProof.verify(merkleProof, merkleRoot, node), 'Error: Invalid proof');
+        return "Proved";
+    }
+    
     function publicSale() public payable {
         require(publicSaleStarted, "Public Sale not started yet!");
         //uint256 EthAmount = msg.value / 10 ** 18;

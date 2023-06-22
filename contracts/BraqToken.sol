@@ -18,4 +18,3 @@ contract BraqToken is ERC20, Ownable {
     }
     
 }
-
