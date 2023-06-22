@@ -15,7 +15,7 @@ const fs = require("fs");
 export async function getRoot(){
 
 const csvData = await new Promise((resolve, reject) => {
-  fs.readFile('whiteList.csv','utf8', (error, data) => {
+  fs.readFile('whiteList1.csv','utf8', (error, data) => {
     if (error) {
       reject(error);
       return;
@@ -41,9 +41,12 @@ const leaves = whiteList.map((x) =>
 
 // create a Merkle tree
 const tree = new MerkleTree(leaves, keccak256, { sort: true });
-console.log(tree.toString());
+console.log("tree ", tree.toString());
 const merkleProof = leaves.map(leaf => tree.getHexProof(leaf));
-console.log("HexProofs ", merkleProofs);
+console.log("HexProofs ", merkleProof);
+const proofArray = merkleProof.flat();
+console.log("Merkle Proof", proofArray);
+console.log(typeof(proofArray));
 const root = tree.getHexRoot();
 /*
 const merkleProof = await hexProofs.map(proof => proof.map((hexString) => { 
@@ -56,4 +59,4 @@ console.log("bytes32", merkleProof);
 console.log("Root", root);
 return {root, merkleProof};
 }
-//getRoot();
+getRoot();
