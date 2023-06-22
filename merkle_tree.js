@@ -1,14 +1,13 @@
-
+/*
 import { MerkleTree } from "merkletreejs";
 import { ethers } from "ethers";
 import keccak256 from "keccak256";
 import fs from 'fs';
-/*
+*/
 const { MerkleTree } = require("merkletreejs");
 const { ethers } = require("ethers");
 const keccak256 = require("keccak256");
 const fs = require("fs");
-*/
 // inputs: array of users' addresses and quantity
 // each item in the inputs array is a block of data
 // Alice, Bob and Carol's data respectively
