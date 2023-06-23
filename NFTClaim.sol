@@ -5,8 +5,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract NFTClaim is Ownable {
-    mapping(uint8 => mapping(uint32 => bool)) public friendsClaimed;
-    mapping(uint8 => mapping(uint32 => bool)) public monstersClaimed;
+    mapping(uint32 => mapping(uint8 => bool)) public friendsClaimed;
+    mapping(uint32 => mapping(uint8 => bool)) public monstersClaimed;
     mapping(uint8 => uint256) fundingTime;
     event TokensClaimed(address indexed user, uint256 tokensAmount);
 
@@ -20,6 +20,7 @@ contract NFTClaim is Ownable {
         BraqTokenContractAddress = _tokenContract;
         BraqTokenInstance = IERC20(BraqTokenContractAddress);
 
+        fundingTime[0] = block.timestamp;
         fundingTime[1] = 1688137200;
         fundingTime[2] = 1696086000;
         fundingTime[3] = 1704034800;
@@ -27,13 +28,13 @@ contract NFTClaim is Ownable {
     }
 
     // Both contracts have no more than 5000 tokens
-    modifier onlyNotClaimedMonsters(uint32 tokenId) {
-       (!monstersClaimed[tokenId], "This BraqMonster is already claimed");
+    modifier onlyNotClaimedMonsters(uint32 tokenId, uint8 quarter) {
+       (!monstersClaimed[tokenId][quarter], "This BraqMonster is already claimed");
         _;
     }
 
-    modifier onlyNotClaimedFriends(uint32 tokenId) {
-       (!friendsClaimed[tokenId], "This BraqFriend is already claimed");
+    modifier onlyNotClaimedFriends(uint32 tokenId, uint8 quarter) {
+       (!friendsClaimed[tokenId][quarter], "This BraqFriend is already claimed");
         _;
     }
 
