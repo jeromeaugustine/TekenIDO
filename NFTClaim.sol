@@ -2,26 +2,23 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-
-interface BraqToken {
-    function transfer(address to, uint256 amount) external returns (bool);
-    // Include other necessary functions like balanceOf, allowance, etc.
-}
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract NFTClaim is Ownable {
-    mapping(uint8 => mapping(uint256 => bool)) public frinedsClaimed;
-    mapping(uint8 => mapping(uint256 => bool)) public monstersClaimed;
-
+    mapping(uint8 => mapping(uint32 => bool)) public friendsClaimed;
+    mapping(uint8 => mapping(uint32 => bool)) public monstersClaimed;
+    mapping(uint8 => uint256) fundingTime;
     event TokensClaimed(address indexed user, uint256 tokensAmount);
 
-    mapping(uint8 => uint256) fundingTime;
-    
+    address private BraqTokenContractAddress;
+    IERC20 private BraqTokenInstance;
 
     function resetClaim() private onlyOwner {
         
     }
-    constructor(address _braqTokenContract) {
-        tokenContract = BraqToken(_braqTokenContract);
+    constructor(address _tokenContract) {
+        BraqTokenContractAddress = _tokenContract;
+        BraqTokenInstance = IERC20(BraqTokenContractAddress);
 
         fundingTime[1] = 1688137200;
         fundingTime[2] = 1696086000;
@@ -29,17 +26,18 @@ contract NFTClaim is Ownable {
         fundingTime[4] = 1711897200;
     }
 
-    modifier onlyNotClaimedMonsters() {
+    // Both contracts have no more than 5000 tokens
+    modifier onlyNotClaimedMonsters(uint32 tokenId) {
        (!monstersClaimed[tokenId], "This BraqMonster is already claimed");
         _;
     }
 
-    modifier onlyNotClaimedFriends() {
+    modifier onlyNotClaimedFriends(uint32 tokenId) {
        (!friendsClaimed[tokenId], "This BraqFriend is already claimed");
         _;
     }
 
-    function claimTokens() external onlyNotClaimed {
+    function claimTokens() external {
         // Perform the necessary validation of the user's NFT ownership before proceeding
         // ...
 
@@ -47,10 +45,9 @@ contract NFTClaim is Ownable {
         uint256 tokensAmount = calculateTokensAmount();
 
         // Perform the token distribution
-        tokenBalances[msg.sender] = tokensAmount;
+        
 
         // Mark the NFT as claimed
-        claimed[msg.sender] = true;
 
         emit TokensClaimed(msg.sender, tokensAmount);
     }
@@ -64,13 +61,11 @@ contract NFTClaim is Ownable {
     }
 
     function withdrawTokens(uint256 amount) external {
-        require(tokenBalances[msg.sender] >= amount, "Insufficient token balance");
-        tokenBalances[msg.sender] -= amount;
+        //require(tokenBalances[msg.sender] >= amount, "Insufficient token balance");
+        //tokenBalances[msg.sender] -= amount;
+
         // Perform the token transfer to the user's wallet
         // ...
     }
 
-    function setIssuer(address newIssuer) external onlyIssuer {
-        issuer = newIssuer;
-    }
 }
