@@ -113,5 +113,44 @@ contract BraqVesting is Ownable{
         pools[Pools.Marketing].amountToFund[5] = 625000;
     }
 
-  
+    function setPoolAddress(
+        Pools _pool, 
+        address _address
+        ) external onlyAdmin {
+        require(_address != address(0), "Error: Insert a valid address");
+        pools[_pool].poolAddress = _address;
+    }
+
+    function getPoolAddress(Pools _pool) external view returns (address) {
+        return pools[_pool].poolAddress;
+    }
+
+    function getAmountToFund(
+        Pools pool,
+        uint8 quarter
+    ) external view returns (uint256) {
+        return pools[pool].amountToFund[quarter];
+    }
+
+    // Quarters counted from July 2023
+    function fundPool(Pools _pool, uint8 _quarter) external onlyAdmin {
+        require(_quarter > 0 && _quarter < 17, "Wrong quarter value");
+        if (block.timestamp < fundingTime[_quarter]) {
+            revert("Error: Too early");
+        }
+        require(
+            pools[_pool].funded[_quarter] == false,
+            "Errror: Already funded"
+        );
+        require(
+            pools[_pool].poolAddress != address(0),
+            "Errror: Pool not initialised"
+        );
+
+        BraqTokenInstance.transfer(
+            pools[_pool].poolAddress,
+            pools[_pool].amountToFund[_quarter] * 10 ** 18
+        );
+        pools[_pool].funded[_quarter] = true;
+    }
 }
