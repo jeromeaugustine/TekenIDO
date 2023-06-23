@@ -2,20 +2,21 @@
 require('babel-register');
 const HDWalletProvider = require("@truffle/hdwallet-provider");
 require('dotenv').config();
-const privateKey = process.env.WALLET_PRIVATE_KEY;
+const walletPrivateKey = process.env.WALLET_PRIVATE_KEY;
+const etherScanPrivateKey = process.env.ETHERSCAN_PRIVATE_KEY;
 
 module.exports = {
   networks: {
     mainnet: {
       provider: function () {
-        return new HDWalletProvider([privateKey], "https://mainnet.infura.io/v3/cc8cc7e34bb440b19e75b2910913a25e")
+        return new HDWalletProvider([walletPrivateKey], "https://mainnet.infura.io/v3/cc8cc7e34bb440b19e75b2910913a25e")
       },
       network_id: 1,
       networkCheckTimeout: 60000,
     },
     testnet: {
       provider: function () {
-        return new HDWalletProvider([privateKey], 'https://sepolia.infura.io/v3/cc8cc7e34bb440b19e75b2910913a25e')
+        return new HDWalletProvider([walletPrivateKey], 'https://sepolia.infura.io/v3/cc8cc7e34bb440b19e75b2910913a25e')
       },
       network_id: 11155111,
       networkCheckTimeout: 60000,
@@ -34,5 +35,11 @@ module.exports = {
     solc: {
       version: "^0.8.9"
     }
+  },
+  plugins: [
+    'truffle-plugin-verify'
+  ],
+  api_keys: {
+    etherscan: etherScanPrivateKey
   }
 }

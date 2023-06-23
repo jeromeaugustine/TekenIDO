@@ -10,17 +10,17 @@ loadEnv();
 const PUBLIC_KEY = process.env.WALLET_PUBLIC_ADDRESS;
 const PRIVATE_KEY = process.env.WALLET_PRIVATE_KEY;
 const NOTOWNER_PRIVATE_KEY = process.env.NOTOWNER_WALLET_PRIVATE_KEY;
-const TOKEN_CONTRACT_ADDRESS = "0x875153E3e781BF4c8E03cE8cEED704a2796a16b4";
-const SALE_CONTRACT_ADDRESS = "0x8e6D1EfE37C77BA0c85a373D687F743ade08758B";
+const TOKEN_CONTRACT_ADDRESS = "0x75bA3ec8A8163C35c4061BD13A17Ef13F812cAc1";
+const SALE_CONTRACT_ADDRESS = "0x4A8A584FdD48d157Ad851B172D7775C3800A190f";
 const my_address = "0x6f9e2777D267FAe69b0C5A24a402D14DA1fBcaA1";
 const Summer_address = "0x19294812D348aa770b006D466571B6D6c4C62365";
 const TOKEN_ABI_FILE_PATH = './build/contracts/BraqToken.json';
 const SALE_ABI_FILE_PATH = './build/contracts/BraqPublicSale.json';
-const WHITELIST_CSV_PATH = './whiteList1.csv';
+const WHITELIST_CSV_PATH = './whiteList.csv';
 
 //const provider = ethers.getDefaultProvider(`https://sepolia.infura.io/v3/0cbd49cd77ed4132b497031ffc95da6a`);
 const provider = ethers.getDefaultProvider(`https://sepolia.infura.io/v3/b4ceed0a8862403d802e4bb169d3cb14`);
-const signer = new ethers.Wallet(NOTOWNER_PRIVATE_KEY, provider);
+const signer = new ethers.Wallet(PRIVATE_KEY, provider);
 
 async function getContract(contractAddress, ABIfilePath){
     const data = await fsPromises.readFile(ABIfilePath, 'utf8');
@@ -57,8 +57,13 @@ async function mintTokens(_to, _amount){
     return mint;
 }
 
-export async function getOwner(){
+export async function getTokenOwner(){
     const owner = await token_contract.owner();
+    return owner;
+}
+
+export async function getSaleOwner(){
+    const owner = await sale_contract.owner();
     return owner;
 }
 
@@ -115,25 +120,30 @@ console.log(await totalSupply() / BigInt(10 ** 18));
 //const mint_tx = await mintTokens("0xC520944Bc9D498b7BeFE887300c501C1D9651B75", 3750000);
 //mint_tx.wait();
 //console.log(mint_tx);
+
 /*
 console.log(await totalSupply() / BigInt(10 ** 18));
 const array = await readAddressesFromCSV(WHITELIST_CSV_PATH);
-console.log(array);
+//console.log(array);
+const saleOwner= await getSaleOwner();
+console.log(saleOwner);
+
+const tokenOwner = await getTokenOwner();
+console.log(tokenOwner);
+
 const WL = await addToWhiteList(array);
 WL.wait();
-console.log(WL);
-const tokenSet = await setToken(TOKEN_CONTRACT_ADDRESS);
-tokenSet.wait();
-const tokenAdr = await getTokenAddress();
-console.log(tokenAdr);
+//console.log(WL);
 const mint_tx = await mintTokens(SALE_CONTRACT_ADDRESS, 3750000);
 mint_tx.wait();
 console.log(mint_tx);
 console.log(await totalSupply() / BigInt(10 ** 18));
 const start = await startPublicSale();
 */
+
 //await publicSale();
 //await withdrawETH(BigInt(0.23 * 10 ** 18));
 
 const tokenAdr = await getTokenAddress();
 console.log(tokenAdr);
+await publicSale();
