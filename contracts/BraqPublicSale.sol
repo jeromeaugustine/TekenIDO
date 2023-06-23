@@ -48,7 +48,7 @@ contract BraqPublicSale is Ownable {
     }
     
     function publicSale() public payable {
-        require(publicSaleStarted, "Public Sale not started yet!");
+        require(publicSaleStarted, "Public Sale stoped!");
         require(msg.value >= 0.025 * 10 ** 18, "Error: Too small amount for purchase");
         if(whitelist[msg.sender]){
             uint256 BraqAmount = msg.value / (5 * 10 ** 13);

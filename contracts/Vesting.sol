@@ -92,7 +92,7 @@ contract BraqVesting is Ownable{
         }
         // Listings
         // TGE 7 500 000
-        BraqTokenInstance.transfer(listingsPoolAddress, 7500000 * 10 ** 18);
+        //BraqTokenInstance.transfer(listingsPoolAddress, 7500000 * 10 ** 18);
         for (uint8 i = 1; i < 5; i++) {
         pools[Pools.Listings].amountToFund[i] = 5 * 10 ** 6;
         }
@@ -106,7 +106,7 @@ contract BraqVesting is Ownable{
         }
         // Marketing 
         // TGE 7 500 000
-        BraqTokenInstance.transfer(marketingPoolAddress, 7500000 * 10 ** 18);
+        //BraqTokenInstance.transfer(marketingPoolAddress, 7500000 * 10 ** 18);
         for (uint8 i = 2; i < 5; i++) {
         pools[Pools.Marketing].amountToFund[i] = 937500;
         }
@@ -153,4 +153,9 @@ contract BraqVesting is Ownable{
         );
         pools[_pool].funded[_quarter] = true;
     }
+
+    function isFunded(Pools _pool, uint8 _quarter)external view returns(bool){
+        return pools[_pool].funded[_quarter];
+    }
+
 }
