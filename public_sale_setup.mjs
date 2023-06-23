@@ -13,7 +13,7 @@ const my_address = "0x6f9e2777D267FAe69b0C5A24a402D14DA1fBcaA1";
 const Summer_address = "0x19294812D348aa770b006D466571B6D6c4C62365";
 const TOKEN_ABI_FILE_PATH = './build/contracts/BraqToken.json';
 const SALE_ABI_FILE_PATH = './build/contracts/BraqPublicSale.json';
-const WHITELIST_CSV_PATH = './whiteList1.csv';
+const WHITELIST_CSV_PATH = './whiteList.csv';
 
 //const provider = ethers.getDefaultProvider(`https://sepolia.infura.io/v3/0cbd49cd77ed4132b497031ffc95da6a`);
 const provider = ethers.getDefaultProvider(`https://sepolia.infura.io/v3/b4ceed0a8862403d802e4bb169d3cb14`);
@@ -63,4 +63,8 @@ export async function addToWhiteList(array){
 export async function startPublicSale(){
     const started = await sale_contract.startPublicSale();
     return started;
+}
+
+export async function stopPublicSale(){
+    const stoped = await sale_contract.stopPublicSale();
 }

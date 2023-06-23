@@ -67,6 +67,10 @@ export async function startPublicSale(){
     return started;
 }
 
+export async function stopPublicSale(){
+    const stoped = await sale_contract.stopPublicSale();
+}
+
 export async function publicSale(){
     // Payable method invocation
     const valueToSend = ethers.parseEther('0.03'); // Value to send in Ether

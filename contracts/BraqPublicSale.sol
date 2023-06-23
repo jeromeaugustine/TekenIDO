@@ -35,12 +35,17 @@ contract BraqPublicSale is Ownable {
     function startPublicSale() external onlyOwner{
         publicSaleStarted = true;
     }
+
+    function stopPublicSale() external onlyOwner{
+        publicSaleStarted = false;
+    }
     
     function justSell(uint256 value, address buyer) private {
         uint256 BraqAmount = uint256(value / (6 * 10 ** 13));
         require(BraqAmount<publicSaleSupply, "Error: Too big amount for purchase");
         BraqTokenInstance.transfer(buyer, BraqAmount * 10 ** 18);
-        publicSaleSupply -= BraqAmount;}
+        publicSaleSupply -= BraqAmount;
+    }
     
     function publicSale() public payable {
         require(publicSaleStarted, "Public Sale not started yet!");
