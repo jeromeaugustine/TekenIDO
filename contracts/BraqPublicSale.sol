@@ -14,7 +14,10 @@ contract BraqPublicSale is Ownable {
     address private BraqTokenContractAddress;
     IERC20 private BraqTokenInstance;
 
-    constructor(){}
+    constructor(address _tokenContract){
+        BraqTokenContractAddress = _tokenContract;
+        BraqTokenInstance = IERC20(BraqTokenContractAddress);
+    }
 
     function setTokenContract(address tokenAddress) external onlyOwner{
         BraqTokenContractAddress = tokenAddress;

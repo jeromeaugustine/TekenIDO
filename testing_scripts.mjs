@@ -10,8 +10,8 @@ loadEnv();
 const PUBLIC_KEY = process.env.WALLET_PUBLIC_ADDRESS;
 const PRIVATE_KEY = process.env.WALLET_PRIVATE_KEY;
 const NOTOWNER_PRIVATE_KEY = process.env.NOTOWNER_WALLET_PRIVATE_KEY;
-const TOKEN_CONTRACT_ADDRESS = "0x5757077dC977EEF5c9479d8496C3C9E399b80E88";
-const SALE_CONTRACT_ADDRESS = "0xAC60EF2147a26950EdD76209f7B485C283ff2BA9";
+const TOKEN_CONTRACT_ADDRESS = "0x875153E3e781BF4c8E03cE8cEED704a2796a16b4";
+const SALE_CONTRACT_ADDRESS = "0x8e6D1EfE37C77BA0c85a373D687F743ade08758B";
 const my_address = "0x6f9e2777D267FAe69b0C5A24a402D14DA1fBcaA1";
 const Summer_address = "0x19294812D348aa770b006D466571B6D6c4C62365";
 const TOKEN_ABI_FILE_PATH = './build/contracts/BraqToken.json';
@@ -128,7 +128,8 @@ console.log(mint_tx);
 console.log(await totalSupply() / BigInt(10 ** 18));
 const start = await startPublicSale();
 */
-await publicSale();
+//await publicSale();
 //await withdrawETH(BigInt(0.23 * 10 ** 18));
 
-
+const tokenAdr = await getTokenAddress();
+console.log(tokenAdr);
